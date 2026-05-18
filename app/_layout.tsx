@@ -10,13 +10,13 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/components/useColorScheme';
-import { Slot, usePathname } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { MoonIcon, SunIcon, SlashIcon, Icon } from '@/components/ui/icon';
+import { Pressable } from '@/components/ui/pressable';
 import { Fab, FabIcon } from '@/components/ui/fab';
-import { MoonIcon, SunIcon, SlashIcon } from '@/components/ui/icon';
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
@@ -29,7 +29,6 @@ export default function RootLayout() {
   });
 
   const [styleLoaded, setStyleLoaded] = useState(false);
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -43,11 +42,9 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const pathname = usePathname();
   const systemColorScheme = useColorScheme();
   const [mode, setMode] = useState<'system' | 'light' | 'dark'>('system');
 
-  // Determine effective color scheme
   const effectiveColorScheme = mode === 'system'
     ? (systemColorScheme ?? 'light')
     : mode;
@@ -65,16 +62,38 @@ function RootLayoutNav() {
   return (
     <GluestackUIProvider mode={mode}>
       <ThemeProvider value={effectiveColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Slot />
-        {pathname === '/' && (
-          <Fab
-            onPress={handleToggleTheme}
-            className="m-6"
-            size="lg"
-          >
-            <FabIcon as={mode === 'system' ? SlashIcon : (effectiveColorScheme === 'dark' ? MoonIcon : SunIcon)} />
-          </Fab>
-        )}
+        <StatusBar/>
+        <Stack>
+          <Stack.Screen
+            name="index"
+            options={{
+              title: "Вхід",
+              headerTitleAlign: "center",
+              headerRight: () => (
+                <Pressable onPress={handleToggleTheme}>
+                  <Icon
+                    as={
+                      mode === "system"
+                        ? SlashIcon
+                        : effectiveColorScheme === "dark"
+                        ? MoonIcon
+                        : SunIcon
+                    }
+                    size="lg"
+                  />
+                </Pressable>
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack>
+
+        {/* <Fab onPress={handleToggleTheme} className="m-6" size="lg" > <FabIcon as={mode === 'system' ? SlashIcon : (effectiveColorScheme === 'dark' ? MoonIcon : SunIcon)} /> </Fab> */}
       </ThemeProvider>
     </GluestackUIProvider>
   );
