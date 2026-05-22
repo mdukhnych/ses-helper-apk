@@ -7,14 +7,15 @@ import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icon';
-import { useRouter } from 'expo-router';
+import useAuth from '@/hooks/useAuth';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const router = useRouter();
+  const { isLoading, login } = useAuth();
 
   const handleState = () => {
     setShowPassword((showState) => {
@@ -42,8 +43,10 @@ export default function Home() {
               </InputSlot>
             </Input>
           </VStack>
-          <Button className="ml-auto">
-            <ButtonText className="w-full text-center" onPress={() => {router.replace("/(tabs)/WarrantyScreen")}} >Вхід</ButtonText>
+          <Button onPress={async () => {await login({email, password})}}>
+            {
+              isLoading ? <Spinner /> : <ButtonText className="text-center">Вхід</ButtonText>
+            }
           </Button>
         </VStack>
       </FormControl>
