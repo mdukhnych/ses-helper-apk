@@ -3,6 +3,8 @@ import { useCallback, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_FIRESTORE } from "@/firebaseConfig";
 import { EasyProData, EktaServicesDataItem, PhoneServicesData, Services, WarrantyDataItem } from "@/types/services";
+import { useInformationStore } from "@/store/useInformationStore";
+import { Information, Instructions, InstructionsItem, Motivations, Promos } from "@/types/information";
 
 export default function useFirestore() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,6 +15,11 @@ export default function useFirestore() {
     setPhoneServicesStore,
     setEktaServicesStore
   } = useServicesStore(state => state);
+
+  const {
+    setInfromationStore,
+    setInstructionsDataStore
+  } = useInformationStore();
 
   const fetchServices = useCallback(async () => {
     setIsLoading(true);
@@ -102,12 +109,75 @@ export default function useFirestore() {
     }
   }, []);
 
+  const fetchInformation = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "information"));
+      const data = Object.fromEntries(
+        querySnapshot.docs.map(doc => [doc.id, doc.data()])
+      );
+      setInfromationStore({
+        instructions: data.instructions as Instructions,
+        motivations: data.motivations as Motivations,
+        promos: data.promos as Promos,
+      });
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const fetchInstructions = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "information", "instructions", "items"));
+      setInstructionsDataStore(
+        querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as InstructionsItem[]
+      );
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+
+  }, []);
+  const fetchMotivations = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+
+  }, []);
+  const fetchPromos = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+
+  }, []);
+
   return {
     isLoading,
     fetchServices,
     fetchWarranties,
     fetchEasyPro,
     fetchPhoneServices,
-    fetchEktaServicesData
+    fetchEktaServicesData,
+    fetchInformation,
+    fetchInstructions,
+    fetchMotivations,
+    fetchPromos
   }
 }

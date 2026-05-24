@@ -34,7 +34,7 @@ export default function ServicesScreen() {
         {
           services ?
             sortedServices.map(service => (
-              <Pressable key={service.id} onPress={() => {
+              <Pressable className="border border-outline-200 rounded-lg overflow-hidden" key={service.id} onPress={() => {
                 router.push({
                   pathname: "/servicesScreens/[serviceId]", 
                   params: { serviceId: service.id } 

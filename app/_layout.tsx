@@ -128,11 +128,12 @@ function RootLayoutNav({
   useEffect(() => {
     const isInTabs = rootSegment === '(tabs)';
     const isInServices = rootSegment === 'servicesScreens';
+    const isInInformation = rootSegment === 'informationScreens';
 
-    if (authUser && !isInTabs && !isInServices) {
+    if (authUser && !isInTabs && !isInServices && !isInInformation) {
       router.replace('/(tabs)/ServicesScreen');
     }
-    if (!authUser && (isInTabs || isInServices)) {
+    if (!authUser && (isInTabs || isInServices || isInInformation)) {
       router.replace('/');
     }
   }, [authUser, router, rootSegment]);

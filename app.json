@@ -7,19 +7,27 @@
     "icon": "./assets/images/icon.png",
     "scheme": "starterkitexpo",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "backgroundColor": "#ffffff",
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "image": "./assets/images/icon.png",
+        "backgroundColor": "#000000"
+      }
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "userInterfaceStyle": "automatic"
     },
     "android": {
+      "userInterfaceStyle": "automatic",
+      "backgroundColor": "#ffffff",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "monochromeImage": "./assets/images/icon.png"
       },
       "edgeToEdgeEnabled": true
     },
@@ -35,6 +43,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "969795f8-1eeb-4034-8e48-f75933b2df58"
+      }
     }
   }
 }
