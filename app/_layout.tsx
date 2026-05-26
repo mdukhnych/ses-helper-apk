@@ -5,11 +5,8 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback, useEffect, useState } from 'react';
-import { useColorScheme } from '@/components/useColorScheme';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { MoonIcon, SunIcon, Icon } from '@/components/ui/icon';
-import { Pressable } from '@/components/ui/pressable';
 import { onAuthStateChanged, User as FirebaseUser } from '@firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH, FIREBASE_AUTH_READY, FIREBASE_FIRESTORE } from '@/firebaseConfig';
@@ -17,7 +14,7 @@ import { useUserStore, User } from '@/store/useUserStore';
 import { useAuthToast } from '@/hooks/useAuthToast';
 import { View } from '@/components/Themed';
 import { useThemeStore } from '@/store/useThemeStore';
-import { SunMoon } from 'lucide-react-native';
+import { useAppColorScheme } from '@/hooks/useAppColorScheme';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -115,25 +112,31 @@ function RootLayoutNav({
   authUser: FirebaseUser | null;
   authErrorMessage: string | null;
 }) {
-  const systemColorScheme = useColorScheme();
   const router = useRouter();
   const segments = useSegments();
   const rootSegment = segments[0];
 
   const mode = useThemeStore(state => state.mode);
   const setMode = useThemeStore(state => state.setMode);
-
-  const effectiveColorScheme = mode === 'system' ? (systemColorScheme ?? 'light') : mode;
+  const effectiveColorScheme = useAppColorScheme();
 
   useEffect(() => {
     const isInTabs = rootSegment === '(tabs)';
     const isInServices = rootSegment === 'servicesScreens';
     const isInInformation = rootSegment === 'informationScreens';
+    const isInSettingsScreen = rootSegment === 'SettingsScreen';
 
-    if (authUser && !isInTabs && !isInServices && !isInInformation) {
+    const isProtectedRoute =
+      isInTabs ||
+      isInServices ||
+      isInInformation ||
+      isInSettingsScreen;
+
+    if (authUser && !isProtectedRoute) {
       router.replace('/(tabs)/ServicesScreen');
     }
-    if (!authUser && (isInTabs || isInServices || isInInformation)) {
+
+    if (!authUser && isProtectedRoute) {
       router.replace('/');
     }
   }, [authUser, router, rootSegment]);
@@ -145,7 +148,7 @@ function RootLayoutNav({
   };
 
   return (
-    <GluestackUIProvider mode={effectiveColorScheme}>
+    <GluestackUIProvider mode={mode}>
       <AuthErrorToast message={authErrorMessage} />
       <ThemeProvider value={effectiveColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <View
@@ -161,20 +164,6 @@ function RootLayoutNav({
               contentStyle: {
                 backgroundColor: effectiveColorScheme === "dark" ? "#000" : "#fff",
               },
-              headerRight: () => (
-                  <Pressable onPress={handleToggleTheme}>
-                    <Icon
-                      as={
-                        mode === "system"
-                          ? SunMoon
-                          : effectiveColorScheme === "dark"
-                          ? MoonIcon
-                          : SunIcon
-                      }
-                      size="xl"
-                    />
-                  </Pressable>
-                ),
             }}>
             <Stack.Screen
               name="index"

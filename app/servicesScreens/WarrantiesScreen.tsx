@@ -35,7 +35,7 @@ export default function WarrantiesScreen() {
   }, [warrantiesDataStore]);
 
   return (
-    <Box className="p-4 gap-4 ">
+    <Box className="p-4 gap-4 h-full">
       <Input 
         variant="rounded"
         size="lg"
@@ -52,7 +52,11 @@ export default function WarrantiesScreen() {
         }
       </Input>
       <Divider className="my-0.5" />
-      <ScrollView>
+      <ScrollView 
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
         <Accordion
           size="md"
           variant="filled"

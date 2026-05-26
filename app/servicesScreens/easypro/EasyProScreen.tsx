@@ -31,7 +31,7 @@ export default function EasyProScreen() {
   const isLoading = pricelist.length === 0;
 
   return (
-    <Box className="p-4 gap-4">
+    <Box className="p-4 gap-4 h-full">
       <Box className="flex-row gap-4 justify-between items-center">
         <Input 
         variant="rounded"
@@ -54,7 +54,11 @@ export default function EasyProScreen() {
       </Pressable>
       </Box>
       <Divider className="my-0.5" />
-      <ScrollView>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
         {
           isLoading ? (
             <Spinner size={"large"} />

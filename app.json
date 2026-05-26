@@ -29,7 +29,8 @@
         "backgroundColor": "#ffffff",
         "monochromeImage": "./assets/images/icon.png"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.mdukhnych.seshelper"
     },
     "web": {
       "bundler": "metro",

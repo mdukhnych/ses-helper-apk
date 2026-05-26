@@ -27,7 +27,11 @@ export default function PhoneServicesScreen() {
   }, [servicesItems]);
 
   return (
-    <ScrollView className="py-4">
+    <ScrollView 
+      className="h-full px-2"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
       <Accordion
         size="md"
         variant="filled"

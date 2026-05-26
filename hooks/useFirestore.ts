@@ -1,172 +1,170 @@
 import { useServicesStore } from "@/store/useServicesStore";
 import { useCallback, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  QuerySnapshot,
+  DocumentData,
+} from "firebase/firestore";
 import { FIREBASE_FIRESTORE } from "@/firebaseConfig";
-import { EasyProData, EktaServicesDataItem, PhoneServicesData, Services, WarrantyDataItem } from "@/types/services";
-import { useInformationStore } from "@/store/useInformationStore";
-import { Information, Instructions, InstructionsItem, Motivations, Promos } from "@/types/information";
+
+import {
+  EasyProData,
+  EktaServicesDataItem,
+  PhoneServicesData,
+  Services,
+  WarrantyDataItem,
+} from "@/types/services";
+
+import {
+  Instructions,
+  Motivations,
+  Promos,
+} from "@/types/information";
+
+import {
+  InformationCollectionKey,
+  DocumentsDataStore,
+  useInformationStore,
+} from "@/store/useInformationStore";
+
+const mapDocsWithId = <T>(querySnapshot: QuerySnapshot<DocumentData>) => {
+  return querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as T;
+};
+
+const mapDocsData = <T>(querySnapshot: QuerySnapshot<DocumentData>) => {
+  return querySnapshot.docs.map(doc => doc.data()) as T;
+};
 
 export default function useFirestore() {
   const [isLoading, setIsLoading] = useState(false);
+
   const {
-    setServicesStore, 
-    setWarrantiesDataStore, 
-    setEasyProDataStore, 
+    setServicesStore,
+    setWarrantiesDataStore,
+    setEasyProDataStore,
     setPhoneServicesStore,
-    setEktaServicesStore
+    setEktaServicesStore,
   } = useServicesStore(state => state);
 
   const {
-    setInfromationStore,
-    setInstructionsDataStore
+    setInformationStore,
+    setDocumentsDataStore,
   } = useInformationStore();
 
-  const fetchServices = useCallback(async () => {
+  const withLoading = useCallback(async (callback: () => Promise<void>) => {
     setIsLoading(true);
+
     try {
-      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "services"));
-      setServicesStore(
-        querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Services
-      );      
+      await callback();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const fetchWarranties = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "services", "warranty-protection", "data"));
-      setWarrantiesDataStore(
-        querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as WarrantyDataItem[]
+  const fetchServices = useCallback(() => {
+    return withLoading(async () => {
+      const querySnapshot = await getDocs(
+        collection(FIREBASE_FIRESTORE, "services")
       );
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
-  const fetchEasyPro = useCallback(async () => {
-    setIsLoading(true);
-    try {
+      setServicesStore(mapDocsWithId<Services>(querySnapshot));
+    });
+  }, [withLoading, setServicesStore]);
+
+  const fetchWarranties = useCallback(() => {
+    return withLoading(async () => {
+      const querySnapshot = await getDocs(
+        collection(FIREBASE_FIRESTORE, "services", "warranty-protection", "data")
+      );
+
+      setWarrantiesDataStore(
+        mapDocsWithId<WarrantyDataItem[]>(querySnapshot)
+      );
+    });
+  }, [withLoading, setWarrantiesDataStore]);
+
+  const fetchEasyPro = useCallback(() => {
+    return withLoading(async () => {
       const [pricelistSnapshot, descriptionSnapshot] = await Promise.all([
         getDocs(collection(FIREBASE_FIRESTORE, "services", "easy-pro", "pricelist")),
-        getDocs(collection(FIREBASE_FIRESTORE, "services", "easy-pro", "description"))
+        getDocs(collection(FIREBASE_FIRESTORE, "services", "easy-pro", "description")),
       ]);
 
       setEasyProDataStore({
-        pricelist: pricelistSnapshot.docs.map(doc => doc.data()),
-        description: descriptionSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()})),
-      } as EasyProData);
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        pricelist: mapDocsData<EasyProData["pricelist"]>(pricelistSnapshot),
+        description: mapDocsWithId<EasyProData["description"]>(descriptionSnapshot),
+      });
+    });
+  }, [withLoading, setEasyProDataStore]);
 
-  const fetchPhoneServices = useCallback(async () => {
-    setIsLoading(true);
-    try {
+  const fetchPhoneServices = useCallback(() => {
+    return withLoading(async () => {
       const [goodsAndServicesSnapshot, servicesItemsSnapshot] = await Promise.all([
         getDocs(collection(FIREBASE_FIRESTORE, "services", "phone-services", "goodsAndServices")),
-        getDocs(collection(FIREBASE_FIRESTORE, "services", "phone-services", "servicesItems"))
+        getDocs(collection(FIREBASE_FIRESTORE, "services", "phone-services", "servicesItems")),
       ]);
 
       setPhoneServicesStore({
-        goodsAndServices: goodsAndServicesSnapshot.docs.map(doc => doc.data()),
-        servicesItems: servicesItemsSnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}))
-      } as PhoneServicesData);
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        goodsAndServices: mapDocsData<PhoneServicesData["goodsAndServices"]>(
+          goodsAndServicesSnapshot
+        ),
+        servicesItems: mapDocsWithId<PhoneServicesData["servicesItems"]>(
+          servicesItemsSnapshot
+        ),
+      });
+    });
+  }, [withLoading, setPhoneServicesStore]);
 
-  const fetchEktaServicesData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "services", "ekta-services", "data"));
+  const fetchEktaServicesData = useCallback(() => {
+    return withLoading(async () => {
+      const querySnapshot = await getDocs(
+        collection(FIREBASE_FIRESTORE, "services", "ekta-services", "data")
+      );
+
       setEktaServicesStore(
-        querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as EktaServicesDataItem[]);
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        mapDocsWithId<EktaServicesDataItem[]>(querySnapshot)
+      );
+    });
+  }, [withLoading, setEktaServicesStore]);
 
-  const fetchInformation = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "information"));
+  const fetchInformation = useCallback(() => {
+    return withLoading(async () => {
+      const querySnapshot = await getDocs(
+        collection(FIREBASE_FIRESTORE, "information")
+      );
+
       const data = Object.fromEntries(
         querySnapshot.docs.map(doc => [doc.id, doc.data()])
       );
-      setInfromationStore({
+
+      setInformationStore({
         instructions: data.instructions as Instructions,
         motivations: data.motivations as Motivations,
         promos: data.promos as Promos,
       });
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    });
+  }, [withLoading, setInformationStore]);
 
-  const fetchInstructions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(FIREBASE_FIRESTORE, "information", "instructions", "items"));
-      setInstructionsDataStore(
-        querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as InstructionsItem[]
-      );
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchInformationsData = useCallback(
+    <K extends InformationCollectionKey>(docName: K) => {
+      return withLoading(async () => {
+        const querySnapshot = await getDocs(
+          collection(FIREBASE_FIRESTORE, "information", docName, "items")
+        );
 
-  }, []);
-  const fetchMotivations = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
+        const data = mapDocsWithId<DocumentsDataStore[K]>(querySnapshot);
 
-  }, []);
-  const fetchPromos = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setIsLoading(false);
-    }
-
-  }, []);
+        setDocumentsDataStore(docName, data);
+      });
+    },
+    [withLoading, setDocumentsDataStore]
+  );
 
   return {
     isLoading,
@@ -176,8 +174,6 @@ export default function useFirestore() {
     fetchPhoneServices,
     fetchEktaServicesData,
     fetchInformation,
-    fetchInstructions,
-    fetchMotivations,
-    fetchPromos
-  }
+    fetchInformationsData,
+  };
 }

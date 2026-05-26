@@ -2,7 +2,7 @@ import { FIREBASE_AUTH, FIREBASE_AUTH_READY, FIREBASE_FIRESTORE } from '@/fireba
 import { useUserStore, User } from '@/store/useUserStore';
 import { FirebaseError } from 'firebase/app';
 import { useRouter } from 'expo-router';
-import { signInWithEmailAndPassword, signOut } from '@firebase/auth';
+import { sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from '@firebase/auth';
 import { doc, getDoc } from "firebase/firestore";
 import { useCallback, useState } from 'react';
 import { useAuthToast } from './useAuthToast';
@@ -104,11 +104,33 @@ export default function useAuth() {
     } finally {
       setIsLoading(false);
     }
-  }, [])
+  }, []);
+
+  const sendChangePasswordEmail = async () => {
+    setIsLoading(true);
+    try {
+      const user = FIREBASE_AUTH.currentUser;
+      if (!user?.email) {
+        throw new Error("Користувач не авторизований або email відсутній");
+      }
+
+      await sendPasswordResetEmail(FIREBASE_AUTH, user.email);
+      showAuthToast({
+        action: "success",
+        title: "Лист відпралено",
+        description: "Вам надіслано лист на пошту. Перейдіть за посиланням для зміни пароля.",
+      });
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
+  };
 
   return {
     isLoading,
     login,
-    logout
+    logout,
+    sendChangePasswordEmail
   }
 }

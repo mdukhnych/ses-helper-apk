@@ -41,19 +41,22 @@ import { Icon, CloseIcon } from '@/components/ui/icon';
 import { Pressable } from '@/components/ui/pressable';
 import { Spinner } from '@/components/ui/spinner';
 import { Card } from '@/components/ui/card';
+import { useRouter } from 'expo-router';
+import { Divider } from '@/components/ui/divider';
 
 export default function InstructionsScreen() {
-  const instructions = useInformationStore(state => state.instructionsDataStore);
+  const instructions = useInformationStore(state => state.documentsDataStore.instructions);
   const categories = useInformationStore(state => state.information?.instructions.categories);
 
   const [showDrawer, setShowDrawer] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searchCat, setSearchCat] = useState("");
 
-  const { fetchInstructions } = useFirestore();
+  const { fetchInformationsData } = useFirestore();
+  const router = useRouter();
 
   useEffect(() => {
-    fetchInstructions();
+    fetchInformationsData("instructions");
   }, []);
 
   const filteredInstructions = instructions?.filter(item => {
@@ -68,10 +71,8 @@ export default function InstructionsScreen() {
     return matchesTitle && matchesCategory;
   });
 
-  console.log(instructions)
-
   return (
-    <Box className="py-4 px-2">
+    <Box className="py-4 px-2 h-full">
       <Button
         onPress={() => {
           setShowDrawer(true);
@@ -81,14 +82,18 @@ export default function InstructionsScreen() {
       </Button>
       <Drawer
         isOpen={showDrawer}
-        size="md"
         anchor="bottom"
         onClose={() => {
           setShowDrawer(false);
         }}
       >
         <DrawerBackdrop />
-        <DrawerContent>
+        <DrawerContent
+         className="h-auto max-h-[90%]"
+         style={{
+          paddingBottom: 30
+         }}
+        >
           <DrawerHeader>
             <Heading size="lg">Пошук інструкцій</Heading>
             <DrawerCloseButton>
@@ -149,13 +154,27 @@ export default function InstructionsScreen() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-      
-      <ScrollView className="pt-4 border-t border-outline-200 mt-4">
+      <Divider className="my-4" />
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20  }}
+      >
         {
           instructions ?
             filteredInstructions.map(item => (
               <Card key={item.id} className="border border-outline-200 my-1">
-                <Pressable>
+                <Pressable
+                  onPress={() => {
+                    router.push({
+                      pathname: '/informationScreens/DocumentViewer',
+                      params: {
+                        collectionKey: 'instructions',
+                        id: item.id,
+                      },
+                    });
+                  }}
+                >
                 <Heading size="md" className="mb-1">
                   {item.title}
                 </Heading>

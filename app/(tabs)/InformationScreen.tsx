@@ -19,7 +19,11 @@ export default function InformationScreen() {
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView
+      className="h-full"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    >
       <Box className="p-2 gap-2">
         {
           information ?
@@ -27,7 +31,7 @@ export default function InformationScreen() {
               <Pressable className="border border-outline-200 rounded-lg overflow-hidden" key={key} onPress={() => {
                   router.push({
                     pathname: "/informationScreens/[screenId]", 
-                    params: { serviceId: key } 
+                    params: { screenId: key } 
                   });
                 }}>
                   <Card className="py-8">

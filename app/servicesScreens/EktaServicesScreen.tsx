@@ -18,7 +18,11 @@ export default function EktaServicesScreen() {
   }, []);
 
   return (
-    <ScrollView className="py-4 px-2">
+    <ScrollView 
+      className="h-full px-2"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
       {
         ektaServicesData.length > 0 ? 
           <Accordion
