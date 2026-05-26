@@ -11,7 +11,7 @@ export default function DynamicServiceRoute() {
   const headerTitle = useServicesStore(state => state.services?.find(item => item.id === serviceId)?.title);
 
   return (
-    <View>
+    <View className="flex-1">
       <Stack.Screen options={{headerTitle: headerTitle}} />
       {
         serviceId === "warranty-protection" ? <WarrantiesScreen /> :

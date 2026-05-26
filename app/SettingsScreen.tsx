@@ -17,7 +17,6 @@ import { ChevronDownIcon } from '@/components/ui/icon';
 import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
 import { ThemeMode, useThemeStore } from '@/store/useThemeStore';
 import useAuth from '@/hooks/useAuth';
-import { Spinner } from '@/components/ui/spinner';
 
 import {
   AlertDialog,
@@ -27,8 +26,7 @@ import {
   AlertDialogBackdrop,
 } from '@/components/ui/alert-dialog';
 import { Heading } from '@/components/ui/heading';
-import { Item } from 'react-stately';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack } from 'expo-router';
 
 const themeOptions: { label: string; value: ThemeMode }[] = [
   { label: 'Системна', value: 'system' },
@@ -150,7 +148,7 @@ export default function SettingsScreen() {
                 <ButtonText>Ні</ButtonText>
               </Button>
               <Button size="sm" onPress={onConfirm}>
-                { isLoading && <Spinner /> }
+                { isLoading &&  <ButtonSpinner/> }
                 <ButtonText>Так</ButtonText>
               </Button>
             </AlertDialogFooter>

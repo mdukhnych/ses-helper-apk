@@ -5,14 +5,16 @@ import { ScrollView } from '@/components/ui/scroll-view';
 import { Accordion, AccordionContent, AccordionContentText, AccordionHeader, AccordionItem, AccordionTitleText, AccordionTrigger } from '@/components/ui/accordion';
 import { Spinner } from '@/components/ui/spinner';
 import AttachmentPreview from '@/components/AttachmentPreview';
+import { useRouter } from 'expo-router';
 
 export default function PromosScreen() {
   const promos = useInformationStore(state => state.documentsDataStore.promos);
   const {fetchInformationsData } = useFirestore();
+  const router = useRouter();
 
   useEffect(() => {
     fetchInformationsData("promos");
-  }, []);
+  }, [fetchInformationsData]);
 
   return (
     <ScrollView
@@ -45,7 +47,17 @@ export default function PromosScreen() {
                       
                     </AccordionContentText>
                     {item.sku ? (
-                        <AttachmentPreview url={item.sku} />
+                        <AttachmentPreview
+                          url={item.sku}
+                          onOpen={() => {
+                            router.push({
+                              pathname: '/informationScreens/PromoAttachmentViewer',
+                              params: {
+                                id: item.id,
+                              },
+                            });
+                          }}
+                        />
                       ) : null}
                   </AccordionContent>
                 </AccordionItem>

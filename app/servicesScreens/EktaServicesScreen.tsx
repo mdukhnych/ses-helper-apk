@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react'
+import { Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import useFirestore from '@/hooks/useFirestore';
 import { useServicesStore } from '@/store/useServicesStore';
 import { Accordion, AccordionContent, AccordionHeader, AccordionItem, AccordionTitleText, AccordionTrigger } from '@/components/ui/accordion';
@@ -7,21 +9,38 @@ import { View, Text } from '@/components/Themed';
 import { Divider } from '@/components/ui/divider';
 import { Spinner } from '@/components/ui/spinner';
 import { Center } from '@/components/ui/center';
+import { Pressable } from '@/components/ui/pressable';
 
 export default function EktaServicesScreen() {
   const ektaServicesData = useServicesStore(state => state.ektaServicesStore);
+  const router = useRouter();
 
   const { fetchEktaServicesData } = useFirestore();
 
   useEffect(() => {
     fetchEktaServicesData();
-  }, []);
+  }, [fetchEktaServicesData]);
+
+  const openDocument = (groupId: string, documentId: string, url: string) => {
+    if (!url) {
+      Alert.alert('Документ', 'У послуги немає посилання на файл');
+      return;
+    }
+
+    router.push({
+      pathname: '/servicesScreens/EktaDocumentViewer',
+      params: {
+        groupId,
+        documentId,
+      },
+    });
+  };
 
   return (
     <ScrollView 
       className="h-full px-2"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: 40, paddingTop: 10 }}
     >
       {
         ektaServicesData.length > 0 ? 
@@ -50,15 +69,20 @@ export default function EktaServicesScreen() {
                     {
                       item.list.map((subItem, i) => (
                         <React.Fragment key={subItem.id}>
-                          <View  className="flex-row items-center gap-4 py-2">
-                            <Text className="flex-1 " numberOfLines={3}>
-                              {subItem.title}
-                            </Text>
+                          <Pressable
+                            className="py-2"
+                            onPress={() => openDocument(item.id, subItem.id, subItem.description)}
+                          >
+                            <View className="flex-row items-center gap-4">
+                              <Text className="flex-1" numberOfLines={3}>
+                                {subItem.title}
+                              </Text>
 
-                            <Text className=" shrink-0">
-                              {subItem.price}
-                            </Text>
-                          </View>
+                              <Text className="shrink-0">
+                                {subItem.price}
+                              </Text>
+                            </View>
+                          </Pressable>
                           { item.list.length-1 > i && <Divider/> }
                         </React.Fragment>
                       ))

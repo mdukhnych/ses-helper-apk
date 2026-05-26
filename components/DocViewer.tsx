@@ -8,17 +8,19 @@ import {
 import Pdf from 'react-native-pdf';
 import { Text } from '@/components/ui/text';
 
-type DocViewerProps = {
-  url: string;
-};
-
 type FileType = 'pdf' | 'image' | 'unknown';
 
-export default function DocViewer({ url }: DocViewerProps) {
+type DocViewerProps = {
+  url: string;
+  fileType?: FileType;
+};
+
+export default function DocViewer({ url, fileType: providedFileType }: DocViewerProps) {
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fileType = useMemo<FileType>(() => {
+    if (providedFileType) return providedFileType;
     if (!url) return 'unknown';
 
     const lowerUrl = url.toLowerCase();
@@ -36,7 +38,7 @@ export default function DocViewer({ url }: DocViewerProps) {
     }
 
     return 'unknown';
-  }, [url]);
+  }, [providedFileType, url]);
 
   if (!url) {
     return (

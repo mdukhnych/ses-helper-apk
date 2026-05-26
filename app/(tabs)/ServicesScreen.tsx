@@ -1,6 +1,5 @@
 import { ScrollView } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
-import useAuth from '@/hooks/useAuth';
 import { Spinner } from '@/components/ui/spinner';
 import useFirestore from '@/hooks/useFirestore';
 import { useServicesStore } from '@/store/useServicesStore';
@@ -9,7 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Box } from '@/components/ui/box';
 import { Pressable } from '@/components/ui/pressable';
 import { useRouter } from 'expo-router';
-import { Button, ButtonText } from '@/components/ui/button';
 
 export default function ServicesScreen() {
   const { fetchServices, isLoading: servicesLoading } = useFirestore();

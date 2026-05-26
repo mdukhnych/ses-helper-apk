@@ -1,6 +1,4 @@
-import { View } from 'react-native'
 import React, { useEffect } from 'react'
-import { Text } from '@/components/ui/text'
 import useFirestore from '@/hooks/useFirestore';
 import { ScrollView } from '@/components/ui/scroll-view';
 import { useInformationStore } from '@/store/useInformationStore';

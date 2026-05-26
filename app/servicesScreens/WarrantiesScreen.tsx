@@ -37,7 +37,6 @@ export default function WarrantiesScreen() {
   return (
     <Box className="p-4 gap-4 h-full">
       <Input 
-        variant="rounded"
         size="lg"
         isDisabled={false}
         isInvalid={false}

@@ -7,10 +7,13 @@ import {
 } from 'react-native';
 import * as XLSX from 'xlsx';
 
+import { ExternalLinkIcon, Icon } from '@/components/ui/icon';
+import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 
 type AttachmentPreviewProps = {
   url?: string | null;
+  onOpen?: () => void;
 };
 
 type FileType = 'image' | 'excel' | 'unknown';
@@ -41,7 +44,13 @@ function getFileType(url: string): FileType {
   return 'unknown';
 }
 
-export default function AttachmentPreview({ url }: AttachmentPreviewProps) {
+const OpenIndicator = () => (
+  <View className="absolute right-2 top-2 z-10 rounded-full bg-background-0/90 p-2 border border-outline-200">
+    <Icon as={ExternalLinkIcon} size="sm" />
+  </View>
+);
+
+export default function AttachmentPreview({ url, onOpen }: AttachmentPreviewProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<TableData>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -101,7 +110,12 @@ export default function AttachmentPreview({ url }: AttachmentPreviewProps) {
 
   if (fileType === 'image') {
     return (
-      <View className="mt-4 overflow-hidden rounded-xl border border-outline-200 bg-background-0">
+      <Pressable
+        className="mt-4 overflow-hidden rounded-xl border border-outline-200 bg-background-0"
+        onPress={onOpen}
+        disabled={!onOpen}
+      >
+        {onOpen ? <OpenIndicator /> : null}
         <Image
           source={{ uri: url }}
           resizeMode="contain"
@@ -110,13 +124,22 @@ export default function AttachmentPreview({ url }: AttachmentPreviewProps) {
             console.log('Image preview error:', error.nativeEvent);
           }}
         />
-      </View>
+      </Pressable>
     );
   }
 
   if (fileType === 'excel') {
     return (
       <View className="mt-4 rounded-xl border border-outline-200 bg-background-0 p-2">
+        {onOpen ? (
+          <Pressable
+            className="absolute right-2 top-2 z-10 rounded-full bg-background-0/90 p-2 border border-outline-200"
+            onPress={onOpen}
+          >
+            <Icon as={ExternalLinkIcon} size="sm" />
+          </Pressable>
+        ) : null}
+
         {isLoading && (
           <View className="h-32 items-center justify-center">
             <ActivityIndicator />
