@@ -34,87 +34,86 @@ export default function EasyProScreen() {
     <Box className="p-4 gap-4 h-full">
       <Box className="flex-row gap-4 justify-between items-center">
         <Input 
-        variant="rounded"
-        size="lg"
-        isDisabled={false}
-        isInvalid={false}
-        isReadOnly={false} 
-        className="flex-1" 
-      >
-        <InputField type="text" placeholder="Введіть модель пристрою..." value={searchValue} onChangeText={setSearchValue} />
-        {
-          searchValue.length > 0 &&
-            <InputSlot className="pr-3" onPress={() => setSearchValue("")}>
-              <InputIcon as={X} />
-            </InputSlot>
-        }
-      </Input>
-      <Pressable onPress={() => router.push("/servicesScreens/easypro/EasyProDescriptionScreen")}>
-        <Icon as={Info} size="xl" />
-      </Pressable>
-      </Box>
-      <Divider className="my-0.5" />
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-        {
-          isLoading ? (
-            <Spinner size={"large"} />
-          ) : filteredPricelist.length > 0 ? (
-            <Accordion
-                size="md"
-                variant="filled"
-                type="single"
-                isCollapsible={true}
-                isDisabled={false}
-                className="gap-2 bg-transparent"
-              >
-                {
-                  filteredPricelist.map(item => (
-                    <AccordionItem 
-                      key={item.model} 
-                      value={item.model} 
-                      className="border border-outline-200 rounded-xl overflow-hidden py-2"
-                    >
-                      <AccordionHeader>
-                        <AccordionTrigger className="flex-row items-center gap-4">
-                          <AccordionTitleText>{item.model}</AccordionTitleText>
-                        </AccordionTrigger>
-                      </AccordionHeader>
-                      
-                      <AccordionContent className="gap-2 border-t border-outline-200 pt-2 bg-transparent">
-                        { item.easypro && (
-                          <Card className="flex-row justify-between border border-outline-200 bg-transparent">
-                            <Text>Easy Pro</Text>
-                            <Text>{item.easypro}</Text>
-                          </Card> 
-                        )}
-                        { item.easypro2 && (
-                          <Card className="flex-row justify-between border border-outline-200 bg-transparent">
-                            <Text>Easy Pro +2</Text>
-                            <Text>{item.easypro2}</Text>
-                          </Card> 
-                        )}
-                        { item.easypro3 && (
-                          <Card className="flex-row justify-between border border-outline-200 bg-transparent">
-                            <Text>Easy Pro +3</Text>
-                            <Text>{item.easypro3}</Text>
-                          </Card> 
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))
-                }
-              </Accordion>
-          ) : (
-              <Text className="text-center mt-4 opacity-50">
-                За запитом "{searchValue}" нічого не знайдено
-              </Text>
-            )
-        }
-      </ScrollView>
+          size="lg"
+          isDisabled={false}
+          isInvalid={false}
+          isReadOnly={false} 
+          className="flex-1" 
+        >
+          <InputField type="text" placeholder="Введіть модель пристрою..." value={searchValue} onChangeText={setSearchValue} />
+          {
+            searchValue.length > 0 &&
+              <InputSlot className="pr-3" onPress={() => setSearchValue("")}>
+                <InputIcon as={X} />
+              </InputSlot>
+          }
+        </Input>
+        <Pressable onPress={() => router.push("/servicesScreens/easypro/EasyProDescriptionScreen")}>
+          <Icon as={Info} size="xl" />
+        </Pressable>
+        </Box>
+        <Divider className="my-0.5" />
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          {
+            isLoading ? (
+              <Spinner size={"large"} />
+            ) : filteredPricelist.length > 0 ? (
+              <Accordion
+                  size="md"
+                  variant="filled"
+                  type="single"
+                  isCollapsible={true}
+                  isDisabled={false}
+                  className="gap-2 bg-transparent"
+                >
+                  {
+                    filteredPricelist.map(item => (
+                      <AccordionItem 
+                        key={item.model} 
+                        value={item.model} 
+                        className="border border-outline-200 rounded-xl overflow-hidden py-2"
+                      >
+                        <AccordionHeader>
+                          <AccordionTrigger className="flex-row items-center gap-4">
+                            <AccordionTitleText>{item.model}</AccordionTitleText>
+                          </AccordionTrigger>
+                        </AccordionHeader>
+                        
+                        <AccordionContent className="gap-2 border-t border-outline-200 pt-2 bg-transparent">
+                          { item.easypro && (
+                            <Card className="flex-row justify-between border border-outline-200 bg-transparent">
+                              <Text>Easy Pro</Text>
+                              <Text>{item.easypro}</Text>
+                            </Card> 
+                          )}
+                          { item.easypro2 && (
+                            <Card className="flex-row justify-between border border-outline-200 bg-transparent">
+                              <Text>Easy Pro +2</Text>
+                              <Text>{item.easypro2}</Text>
+                            </Card> 
+                          )}
+                          { item.easypro3 && (
+                            <Card className="flex-row justify-between border border-outline-200 bg-transparent">
+                              <Text>Easy Pro +3</Text>
+                              <Text>{item.easypro3}</Text>
+                            </Card> 
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))
+                  }
+                </Accordion>
+            ) : (
+                <Text className="text-center mt-4 opacity-50">
+                  За запитом "{searchValue}" нічого не знайдено
+                </Text>
+              )
+          }
+        </ScrollView>
     </Box>
   )
 }

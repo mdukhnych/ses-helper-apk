@@ -1,8 +1,9 @@
-import { ScrollView } from 'react-native'
+import { Alert, ScrollView } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Text } from '@/components/Themed';
 import useFirestore from '@/hooks/useFirestore';
 import { useServicesStore } from '@/store/useServicesStore';
+import { useRouter } from 'expo-router';
 
 import {
   Accordion,
@@ -16,11 +17,13 @@ import { Box } from '@/components/ui/box';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { X } from 'lucide-react-native';
 import { Divider } from '@/components/ui/divider';
+import { Button, ButtonText } from '@/components/ui/button';
 
 export default function WarrantiesScreen() {
   const { fetchWarranties, isLoading } = useFirestore();
   const { warrantiesDataStore } = useServicesStore(state => state);
   const [price, setPrice] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     fetchWarranties();
@@ -33,6 +36,21 @@ export default function WarrantiesScreen() {
       return (a.order ?? 0) - (b.order ?? 0);
     });
   }, [warrantiesDataStore]);
+
+  const openMemo = (title: string, fileURL: string) => {
+    if (!fileURL) {
+      Alert.alert('Пам\'ятка', 'У цієї пам\'ятки немає посилання на файл');
+      return;
+    }
+
+    router.push({
+      pathname: '/servicesScreens/WarrantiesDocumentViewer',
+      params: {
+        title,
+        url: fileURL,
+      },
+    });
+  };
 
   return (
     <Box className="p-4 gap-4 h-full">
@@ -84,6 +102,14 @@ export default function WarrantiesScreen() {
                       item.description
                     }
                   </AccordionContentText>
+                  {
+                    item.fileURL &&
+                      <Box className="pt-4 mt-4 border-t border-outline-200">
+                        <Button onPress={() => openMemo(item.title, item.fileURL)}>
+                          <ButtonText>Пам'ятка</ButtonText>
+                        </Button>
+                      </Box>
+                  }
                 </AccordionContent>
               </AccordionItem>
             ))

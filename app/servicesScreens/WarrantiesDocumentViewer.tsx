@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 
 import DocViewer from '@/components/DocViewer';
 import { Text } from '@/components/ui/text';
-import { useServicesStore } from '@/store/useServicesStore';
 import { resolveDocumentUrl } from '@/utils/resolveDocumentUrl';
 
 const normalizeParam = (param: string | string[] | undefined) => {
@@ -12,28 +11,16 @@ const normalizeParam = (param: string | string[] | undefined) => {
   return param;
 };
 
-export default function EktaDocumentViewer() {
+export default function WarrantiesDocumentViewer() {
   const params = useLocalSearchParams<{
-    groupId?: string;
-    documentId?: string;
+    title?: string;
+    url?: string;
   }>();
 
-  const groupId = normalizeParam(params.groupId);
-  const documentId = normalizeParam(params.documentId);
-  const ektaServicesData = useServicesStore(state => state.ektaServicesStore);
+  const title = normalizeParam(params.title) || 'Перегляд документа';
+  const sourceUrl = normalizeParam(params.url);
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const document = useMemo(() => {
-    if (!groupId || !documentId) return undefined;
-
-    return ektaServicesData
-      .find(group => group.id === groupId)
-      ?.list.find(item => item.id === documentId);
-  }, [documentId, ektaServicesData, groupId]);
-
-  const title = document?.title || 'Перегляд документа';
-  const sourceUrl = document?.description;
 
   useEffect(() => {
     let isMounted = true;
@@ -48,7 +35,7 @@ export default function EktaDocumentViewer() {
         if (isMounted) setResolvedUrl(url);
       })
       .catch(error => {
-        console.log('EKTA document URL resolve error:', error);
+        console.log('Warranty document URL resolve error:', error);
         if (isMounted) {
           setErrorMessage('Не вдалося отримати посилання на файл');
         }
@@ -58,40 +45,6 @@ export default function EktaDocumentViewer() {
       isMounted = false;
     };
   }, [sourceUrl]);
-
-  if (!groupId || !documentId) {
-    return (
-      <View className="flex-1 items-center justify-center px-4 bg-white">
-        <Stack.Screen
-          options={{
-            headerTitle: 'Перегляд документа',
-            headerTitleAlign: 'center',
-          }}
-        />
-
-        <Text className="text-center">
-          Не передано дані документа
-        </Text>
-      </View>
-    );
-  }
-
-  if (!document) {
-    return (
-      <View className="flex-1 items-center justify-center px-4 bg-white">
-        <Stack.Screen
-          options={{
-            headerTitle: 'Перегляд документа',
-            headerTitleAlign: 'center',
-          }}
-        />
-
-        <Text className="text-center">
-          Документ не знайдено
-        </Text>
-      </View>
-    );
-  }
 
   if (!sourceUrl) {
     return (
@@ -104,7 +57,7 @@ export default function EktaDocumentViewer() {
         />
 
         <Text className="text-center">
-          У послуги немає посилання на файл
+          У пам'ятки немає посилання на файл
         </Text>
       </View>
     );
